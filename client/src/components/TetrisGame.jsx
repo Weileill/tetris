@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import BoardCanvas from './BoardCanvas';
 import MobileControls from './MobileControls';
 import TouchArea from './TouchArea';
-import './tetris-extra.css'; // optional: 若你有額外樣式，可引入
 import { io } from 'socket.io-client';
 
 const SERVER = (import.meta.env.VITE_SERVER_URL) || 'http://localhost:4000';
