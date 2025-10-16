@@ -1,4 +1,5 @@
 // client/src/components/TouchArea.jsx
+// client/src/components/TouchArea.jsx
 import React, { useRef } from 'react';
 import './mobile-controls.css';
 
@@ -6,16 +7,17 @@ export default function TouchArea({ onLeft, onRight, onRotate, onSoft, onHard, c
   const t = useRef({ x:0, y:0, time:0, lastTap:0 });
 
   function onTouchStart(e) {
-    const p = e.touches ? e.touches[0] : e;
+    if (e.cancelable) e.preventDefault();
+    const p = e.touches ? e.touches[0] : (e.pointerType ? e : e);
     t.current.x = p.clientX;
     t.current.y = p.clientY;
     t.current.time = Date.now();
   }
 
   function onTouchEnd(e) {
+    if (e.cancelable) e.preventDefault();
     const now = Date.now();
     const dt = now - t.current.time;
-    // if touches available use changedTouches
     const p = (e.changedTouches && e.changedTouches[0]) || e;
     const dx = (p.clientX || 0) - t.current.x;
     const dy = (p.clientY || 0) - t.current.y;
@@ -38,13 +40,11 @@ export default function TouchArea({ onLeft, onRight, onRotate, onSoft, onHard, c
       return;
     }
 
-    // horizontal swipe
     if (absX > absY && absX > SWIPE_THRESHOLD) {
       if (dx > 0) onRight(); else onLeft();
       return;
     }
 
-    // vertical swipe down = soft drop
     if (absY > absX && dy > SWIPE_THRESHOLD) {
       onSoft();
       return;
@@ -56,8 +56,8 @@ export default function TouchArea({ onLeft, onRight, onRotate, onSoft, onHard, c
       className="touch-area"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
-      onMouseDown={(e) => onTouchStart(e)}
-      onMouseUp={(e) => onTouchEnd(e)}
+      onPointerDown={onTouchStart}
+      onPointerUp={onTouchEnd}
       role="presentation"
     >
       {children}

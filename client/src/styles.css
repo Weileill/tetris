@@ -169,3 +169,54 @@ canvas{
   .container{ padding:12px; }
   .site-header{ padding:12px; }
 }
+/* ---------- mobile / overlay fixes ---------- */
+
+/* 確保主 container 在行動裝置上不會被固定按鈕或 footer 擋住 */
+@media (max-width: 900px) {
+  .container {
+    padding-bottom: 140px; /* 留空間給行動控制列（調整數值視實際高度） */
+  }
+}
+
+/* touch-area 覆蓋在 canvas 外圍，並接受手勢（禁止預設滾動） */
+.touch-area {
+  position: relative; /* 保持內部元素流動 */
+  z-index: 30; /* 高於 canvas */
+  touch-action: none; /* 禁用預設手勢（滾動/縮放）以便我們處理 swipe/tap */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 把行動控制按鈕放在視窗底部且在最上層，pointer-events 保留 */
+.mobile-controls {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  gap: 12px;
+}
+
+/* 若你想在桌機隱藏這些按鈕（可選） */
+@media (min-width: 901px) {
+  .mobile-controls { display: none; }
+}
+
+/* 確保 footer/tips 在 z-index 较低，不會蓋到 controls（如果 footer 使用 fixed，調低其 z-index） */
+.footer-note, .tips {
+  position: relative;
+  z-index: 10;
+}
+
+/* 小調整讓按鈕更容易點擊 */
+.mc-btn {
+  min-width: 48px;
+  min-height: 48px;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
