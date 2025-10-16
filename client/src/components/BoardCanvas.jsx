@@ -1,44 +1,94 @@
 // responsive BoardCanvas.jsx (替換原版)
+// client/src/components/BoardCanvas.jsx
 import React, { useEffect, useRef } from 'react';
 
-export default function BoardCanvas({ board = [], blockSize = 24, width = 10, height = 20 }) {
-  const ref = useRef(null);
+export default function BoardCanvas({
+  board = [],
+  width = 10,
+  height = 20,
+  // optional desired max block size; we'll compute best fit
+  maxBlockSize = 28,
+  minBlockSize = 8,
+  containerClass = 'board-canvas-wrap'
+}) {
+  const canvasRef = useRef(null);
+  const wrapRef = useRef(null);
 
+  // compute and draw
   useEffect(() => {
-    const canvas = ref.current;
-    if(!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const ratio = window.devicePixelRatio || 1;
+    const canvas = canvasRef.current;
+    const wrap = wrapRef.current;
+    if (!canvas || !wrap) return;
 
-    // logical pixel size
-    const logicalW = width * blockSize;
-    const logicalH = height * blockSize;
+    const dpr = window.devicePixelRatio || 1;
 
-    // set backing store size (for crisp scaling)
-    canvas.width = Math.round(logicalW * ratio);
-    canvas.height = Math.round(logicalH * ratio);
+    function computeAndDraw() {
+      // available CSS pixels for canvas container
+      const rect = wrap.getBoundingClientRect();
+      const availW = Math.max(20, rect.width);
+      const availH = Math.max(20, rect.height);
 
-    // set CSS display size (allow responsive shrink)
-    canvas.style.width = Math.min(logicalW, canvas.parentElement.clientWidth) + 'px';
-    canvas.style.height = (canvas.style.width.replace('px','') / logicalW * logicalH) + 'px';
+      // compute best block size to fit WIDTH x HEIGHT into availW x availH
+      const blockSizeByW = Math.floor(availW / width);
+      const blockSizeByH = Math.floor(availH / height);
+      let blockSize = Math.min(blockSizeByW, blockSizeByH);
+      blockSize = Math.max(minBlockSize, Math.min(maxBlockSize, blockSize));
+      // final canvas css width/height in CSS pixels
+      const cssW = blockSize * width;
+      const cssH = blockSize * height;
 
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    ctx.clearRect(0,0,canvas.width, canvas.height);
+      // set CSS size to canvas element
+      canvas.style.width = cssW + 'px';
+      canvas.style.height = cssH + 'px';
 
-    if(!Array.isArray(board)) return;
+      // set actual pixel buffer size for high DPI
+      canvas.width = Math.floor(cssW * dpr);
+      canvas.height = Math.floor(cssH * dpr);
 
-    board.forEach((row,y) => {
-      row.forEach((cell,x) => {
-        if(cell){
-          ctx.fillStyle = cell;
-          ctx.fillRect(x*blockSize, y*blockSize, blockSize-1, blockSize-1);
-        } else {
-          ctx.strokeStyle = 'rgba(255,255,255,0.02)';
-          ctx.strokeRect(x*blockSize, y*blockSize, blockSize, blockSize);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      // scale coordinate system for DPR
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // clear
+      ctx.clearRect(0, 0, cssW, cssH);
+
+      // draw grid + cells
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const cell = (board[y] && board[y][x]) ? board[y][x] : null;
+          if (cell) {
+            ctx.fillStyle = cell;
+            ctx.fillRect(x * blockSize, y * blockSize, blockSize - 1, blockSize - 1);
+          } else {
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.strokeRect(x * blockSize, y * blockSize, blockSize, blockSize);
+          }
         }
-      });
-    });
-  }, [board, blockSize, width, height]);
+      }
+    }
 
-  return <canvas ref={ref} style={{display:'block', maxWidth:'100%'}} />;
+    // initial draw
+    computeAndDraw();
+
+    // observe wrapper resize
+    const ro = new ResizeObserver(() => computeAndDraw());
+    ro.observe(wrap);
+
+    // also listen to orientationchange
+    window.addEventListener('orientationchange', computeAndDraw);
+    window.addEventListener('resize', computeAndDraw);
+
+    return () => {
+      try { ro.disconnect(); } catch (e) {}
+      window.removeEventListener('orientationchange', computeAndDraw);
+      window.removeEventListener('resize', computeAndDraw);
+    };
+  }, [board, width, height, maxBlockSize, minBlockSize]);
+
+  return (
+    <div ref={wrapRef} className={containerClass} style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
+      <canvas ref={canvasRef} />
+    </div>
+  );
 }
+
