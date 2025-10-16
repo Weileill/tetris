@@ -154,13 +154,7 @@ canvas{
 }
 .leaderboard li strong{ color: #fff; }
 
-/* small footer */
-.footer-note{
-  margin-top:14px;
-  text-align:center;
-  color:var(--muted);
-  font-size:13px;
-}
+
 
 /* responsive */
 @media (max-width: 900px){
@@ -231,28 +225,7 @@ canvas{
   }
 }
 
-/* 2) footer/tip 文字不要攔截觸控（如果你需要它可以被點，請小心使用） */
-.footer-note,
-.tip,
-.tips {
-  position: relative;   /* 不要 fixed 底部，改為頁面流內元素（若你想 fixed，見下一段） */
-  z-index: 5;           /* 低於控制鍵 */
-  pointer-events: none; /* 不會攔截點擊事件 -> 觸控會穿透到下層 */
-  margin: 8px 0 0 0;
-  color: rgba(226,232,240,0.75);
-}
 
-/* 3) 若你真的要讓 tip fixed 在底部，可把它提高 (上移) 並降低攔截能力 */
-.tip-fixed { /* 例：<div class="tip-fixed">Tip...</div> */
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(100px + env(safe-area-inset-bottom)); /* 上移，讓開出空間 */
-  z-index: 10;
-  pointer-events: none; /* 仍使其不攔截事件 */
-  text-align: center;
-  padding: 6px 12px;
-}
 
 /* 4) 行動控制鍵：固定在視窗底部且層級高、可接受觸控 */
 .mobile-controls {

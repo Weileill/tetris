@@ -38,9 +38,7 @@ export default function App() {
           </aside>
         </div>
 
-        <footer className="footer-note">
-          Tip: Controls — ← → move • ↑ rotate • ↓ soft drop • Space hard drop
-        </footer>
+        
       </main>
     </div>
   )
