@@ -1,50 +1,44 @@
+// responsive BoardCanvas.jsx (替換原版)
 import React, { useEffect, useRef } from 'react';
 
 export default function BoardCanvas({ board = [], blockSize = 24, width = 10, height = 20 }) {
   const ref = useRef(null);
 
   useEffect(() => {
-    try {
-      const canvas = ref.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext && canvas.getContext('2d');
-      if (!ctx) return;
+    const canvas = ref.current;
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const ratio = window.devicePixelRatio || 1;
 
-      // Ensure numeric sizes
-      const w = Number(width) || 10;
-      const h = Number(height) || 20;
-      const bs = Number(blockSize) || 24;
+    // logical pixel size
+    const logicalW = width * blockSize;
+    const logicalH = height * blockSize;
 
-      canvas.width = w * bs;
-      canvas.height = h * bs;
+    // set backing store size (for crisp scaling)
+    canvas.width = Math.round(logicalW * ratio);
+    canvas.height = Math.round(logicalH * ratio);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // set CSS display size (allow responsive shrink)
+    canvas.style.width = Math.min(logicalW, canvas.parentElement.clientWidth) + 'px';
+    canvas.style.height = (canvas.style.width.replace('px','') / logicalW * logicalH) + 'px';
 
-      if (!Array.isArray(board)) {
-        // nothing to draw
-        return;
-      }
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0,0,canvas.width, canvas.height);
 
-      board.forEach((row = [], y) => {
-        row.forEach((cell, x) => {
-          try {
-            if (cell) {
-              ctx.fillStyle = cell;
-              ctx.fillRect(x * bs, y * bs, bs - 1, bs - 1);
-            } else {
-              ctx.strokeStyle = 'rgba(255,255,255,0.02)';
-              ctx.strokeRect(x * bs, y * bs, bs, bs);
-            }
-          } catch (innerErr) {
-            // avoid one cell error breaking whole draw
-            console.warn('BoardCanvas cell draw error', innerErr);
-          }
-        });
+    if(!Array.isArray(board)) return;
+
+    board.forEach((row,y) => {
+      row.forEach((cell,x) => {
+        if(cell){
+          ctx.fillStyle = cell;
+          ctx.fillRect(x*blockSize, y*blockSize, blockSize-1, blockSize-1);
+        } else {
+          ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+          ctx.strokeRect(x*blockSize, y*blockSize, blockSize, blockSize);
+        }
       });
-    } catch (err) {
-      console.error('BoardCanvas draw failed', err);
-    }
+    });
   }, [board, blockSize, width, height]);
 
-  return <canvas ref={ref} style={{ display: 'block' }} />;
+  return <canvas ref={ref} style={{display:'block', maxWidth:'100%'}} />;
 }
