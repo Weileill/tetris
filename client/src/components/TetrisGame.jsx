@@ -6,7 +6,7 @@ import MobileControls from './MobileControls';
 import TouchArea from './TouchArea';
 import useWindowSize from '../hooks/useWindowSize';
 import { io } from 'socket.io-client';
-
+const gameRef = useRef(null);
 const SERVER = (import.meta.env.VITE_SERVER_URL) || 'http://localhost:4000';
 const socket = io(SERVER, { autoConnect: true });
 
@@ -203,17 +203,45 @@ export default function TetrisGame() {
   }
 
   useEffect(() => {
-    function onKey(e) {
-      if (!isRunning) return;
-      if (e.key === 'ArrowLeft') movePiece(-1);
-      if (e.key === 'ArrowRight') movePiece(1);
-      if (e.key === 'ArrowUp') rotatePiece();
-      if (e.key === 'ArrowDown') softDrop();
-      if (e.key === ' ') { e.preventDefault(); hardDrop(); }
-    }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isRunning, board, piece]);
+  // helper — 判斷事件 target 是否是可輸入元素（若是就不要攔截）
+  function isTypingTarget(target) {
+    if (!target) return false;
+    const tag = target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return true;
+    if (target.isContentEditable) return true;
+    return false;
+  }
+
+  function onKeyDown(e) {
+
+    const key = e.key;
+
+    const handledKeys = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'Spacebar']); // ' ' and 'Spacebar' for older browsers
+
+   
+    if (!handledKeys.has(key)) return;
+
+    
+    if (isTypingTarget(document.activeElement)) return;
+
+  
+    const gameHasFocus = (document.activeElement === gameRef.current);
+    if (!isRunning && !gameHasFocus) return;
+
+    // At this point: prevent page scrolling / default
+    if (e.cancelable) e.preventDefault();
+
+    // handle keys
+    if (key === 'ArrowLeft') movePiece(-1);
+    else if (key === 'ArrowRight') movePiece(1);
+    else if (key === 'ArrowUp') rotatePiece();
+    else if (key === 'ArrowDown') softDrop();
+    else if (key === ' ' || key === 'Spacebar') { e.preventDefault(); hardDrop(); }
+  }
+
+  window.addEventListener('keydown', onKeyDown);
+  return () => window.removeEventListener('keydown', onKeyDown);
+}, [isRunning, board, piece]); // 保留依賴
 
   useEffect(() => {
     if (!isRunning) return;
@@ -310,8 +338,13 @@ export default function TetrisGame() {
   const renderBoard = getBoardWithPiece();
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+    <div
+    ref={gameRef}
+    tabIndex={0}
+    onClick={() => { try { gameRef.current && gameRef.current.focus(); } catch(e){} }}
+    style={{ outline: 'none' /* remove focus ring if you handle CSS focus */ }}>
+      <div  
+      style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
           <TouchArea onLeft={moveLeft} onRight={moveRight} onRotate={rotate} onSoft={soft} onHard={hard}>
             <BoardCanvas board={renderBoard} width={WIDTH} height={HEIGHT} maxBlockSize={maxBlock} />
