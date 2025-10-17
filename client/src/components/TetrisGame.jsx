@@ -1,25 +1,15 @@
-// client/src/components/TetrisGame.jsx
+
+// FILE: client/src/components/TetrisGame.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import BoardCanvas from './BoardCanvas';
 import MobileControls from './MobileControls';
 import TouchArea from './TouchArea';
+import useWindowSize from '../hooks/useWindowSize';
+import './tetris-extra.css'; // optional helpers
 import { io } from 'socket.io-client';
-import useWindowSize from '../hooks/useWindowSize'; // （下面我會給你小 hook）
 
-const SERVER = import.meta.env.VITE_SERVER_URL || window.location.origin;
-export const socket = io(SERVER, {
-  transports: ['websocket', 'polling'],
-  reconnection: true,
-  reconnectionAttempts: 10,
-  reconnectionDelay: 1000,
-  autoConnect: true,
-});
-
-socket.on('connect', () => console.log('socket connected to', SERVER, socket.id));
-socket.on('connect_error', (err) => console.warn('socket connect_error', err));
-socket.on('disconnect', (r) => console.log('socket disconnected', r));
-
-// ...
+const SERVER = (import.meta.env.VITE_SERVER_URL) || 'http://localhost:4000';
+const socket = io(SERVER, { autoConnect: true });
 
 const WIDTH = 10;
 const HEIGHT = 20;
@@ -34,13 +24,6 @@ const COLORS = {
   T: '#b13cff',
   Z: '#ff3b3b'
 };
-const { width: winW } = useWindowSize();
-const desktopMax = 48; // 桌機最大格子（可再調整）
-const mobileMax = 28;  // 手機最大格子
-const maxBlock = (winW && winW >= 1200) ? desktopMax : mobileMax;
-
-// 傳給 BoardCanvas
-<BoardCanvas board={renderBoard} width={WIDTH} height={HEIGHT} maxBlockSize={maxBlock} />
 
 const TETROMINOS = {
   I: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
@@ -61,10 +44,9 @@ function cloneMatrix(m) {
 }
 function randomPiece() {
   const type = PIECES[Math.floor(Math.random() * PIECES.length)];
-  // center x so piece appears near middle; adjust spawn y for tall pieces (I)
   const matrix = TETROMINOS[type].map(r => r.slice());
   const x = Math.floor(WIDTH / 2) - Math.ceil(matrix[0].length / 2);
-  const y = - (matrix.length - 1); // spawn slightly above visible board (works with collision check)
+  const y = - (matrix.length - 1);
   return { type, matrix, x, y };
 }
 function rotateMatrix(m) {
@@ -79,6 +61,14 @@ function rotateMatrix(m) {
 }
 
 export default function TetrisGame() {
+  const { width: winW } = useWindowSize();
+
+  // choose sensible max block sizes based on viewport width
+  const DESKTOP_BREAK = 1200; // px
+  const desktopMax = 48; // bigger blocks on large screens
+  const mobileMax = 28;  // keep mobile reasonable
+  const maxBlock = (winW && winW >= DESKTOP_BREAK) ? desktopMax : mobileMax;
+
   const [board, setBoard] = useState(createBoard());
   const [piece, setPiece] = useState(randomPiece());
   const [nextPiece, setNextPiece] = useState(randomPiece());
@@ -88,18 +78,15 @@ export default function TetrisGame() {
   const [isRunning, setIsRunning] = useState(true);
   const [gameOver, setGameOver] = useState(false);
 
-  // Skills (simple cooldown based)
   const [skills, setSkills] = useState({
     slow: { cooldown: 30000, readyAt: 0, duration: 10000 },
     clearRandom: { cooldown: 20000, readyAt: 0 },
     swapNext: { cooldown: 15000, readyAt: 0 }
   });
 
-  // Refs for stable interval access
   const dropRef = useRef(dropInterval);
   dropRef.current = dropInterval;
 
-  // Helper: check collision of matrix at pos
   function collide(m, posX, posY) {
     for (let y = 0; y < m.length; y++) {
       for (let x = 0; x < m[y].length; x++) {
@@ -113,7 +100,6 @@ export default function TetrisGame() {
     return false;
   }
 
-  // Place piece (for rendering)
   function getBoardWithPiece() {
     const b = cloneMatrix(board);
     const m = piece.matrix;
@@ -131,7 +117,6 @@ export default function TetrisGame() {
     return b;
   }
 
-  // Lock piece into board and spawn next
   function lockPiece() {
     try {
       const b = cloneMatrix(board);
@@ -142,7 +127,6 @@ export default function TetrisGame() {
             const bx = piece.x + x;
             const by = piece.y + y;
             if (by < 0) {
-              // Piece locked above the board: game over
               setGameOver(true);
               setIsRunning(false);
               submitScore();
@@ -153,7 +137,6 @@ export default function TetrisGame() {
         }
       }
 
-      // clear lines
       let cleared = 0;
       const newBoard = b.filter(row => {
         if (row.every(cell => cell)) { cleared++; return false; }
@@ -166,7 +149,6 @@ export default function TetrisGame() {
         const lineScores = [0, 40, 100, 300, 1200];
         setScore(s => s + (lineScores[cleared] || cleared * 100));
         setLines(l => l + cleared);
-        // optionally speed up drop a bit per lines cleared
         setDropInterval(d => Math.max(80, Math.round(d * 0.98)));
       }
 
@@ -177,7 +159,6 @@ export default function TetrisGame() {
     }
   }
 
-  // Movement helpers used by desktop and mobile
   function movePiece(dx) {
     setPiece(p => {
       const nx = p.x + dx;
@@ -192,14 +173,8 @@ export default function TetrisGame() {
     setPiece(p => {
       let ny = p.y;
       while (!collide(p.matrix, p.x, ny + 1)) ny++;
-      // lock immediately after setting y
       const newPiece = { ...p, y: ny };
-      // Because lockPiece uses current piece & board states, we call lock after setPiece completes.
-      // We'll perform lock after a tiny tick to ensure state updated.
-      setTimeout(() => {
-        // If piece hasn't changed (simple guard), call lockPiece using latest piece state
-        lockPiece();
-      }, 0);
+      setTimeout(() => { lockPiece(); }, 0);
       return newPiece;
     });
   }
@@ -209,8 +184,6 @@ export default function TetrisGame() {
       if (!collide(p.matrix, p.x, p.y + 1)) {
         return { ...p, y: p.y + 1 };
       } else {
-        // can't move down -> lock
-        // call lockPiece on next tick to allow state flush
         setTimeout(lockPiece, 0);
         return p;
       }
@@ -230,7 +203,6 @@ export default function TetrisGame() {
     });
   }
 
-  // Keyboard controls (desktop)
   useEffect(() => {
     function onKey(e) {
       if (!isRunning) return;
@@ -244,25 +216,21 @@ export default function TetrisGame() {
     return () => window.removeEventListener('keydown', onKey);
   }, [isRunning, board, piece]);
 
-  // Auto-drop loop
   useEffect(() => {
     if (!isRunning) return;
     const id = setInterval(() => {
-      // prefer direct mutation via setPiece to avoid stale closures
       setPiece(p => {
         if (!collide(p.matrix, p.x, p.y + 1)) {
           return { ...p, y: p.y + 1 };
         } else {
-          // lock
           setTimeout(lockPiece, 0);
           return p;
         }
       });
     }, dropRef.current);
     return () => clearInterval(id);
-  }, [isRunning, board, piece]); // dependencies ensure re-evaluation
+  }, [isRunning, board, piece]);
 
-  // Reset game
   function resetGame() {
     setBoard(createBoard());
     setPiece(randomPiece());
@@ -274,7 +242,6 @@ export default function TetrisGame() {
     setIsRunning(true);
   }
 
-  // Submit score to server
   async function submitScore() {
     try {
       await fetch(`${SERVER}/api/score`, {
@@ -287,7 +254,6 @@ export default function TetrisGame() {
     }
   }
 
-  // Skills usage
   function canUse(skillKey) {
     return Date.now() >= (skills[skillKey]?.readyAt || 0);
   }
@@ -324,28 +290,32 @@ export default function TetrisGame() {
     setSkills(s => ({ ...s, swapNext: { ...s.swapNext, readyAt: Date.now() + s.swapNext.cooldown } }));
   }
 
-  // Small debug effect for monitoring
   useEffect(() => {
-    // console.log('state', { score, lines, isRunning, dropInterval });
-  }, [score, lines, isRunning, dropInterval]);
+    // socket logging (optional)
+    socket.on('connect', () => console.log('socket connected', socket.id));
+    socket.on('connect_error', (err) => console.warn('socket connect_error', err));
+    socket.on('disconnect', (r) => console.log('socket disconnected', r));
+    return () => {
+      socket.off('connect');
+      socket.off('connect_error');
+      socket.off('disconnect');
+    };
+  }, []);
 
-  // Exposed wrapper functions for mobile controls
   function moveLeft() { movePiece(-1); }
   function moveRight() { movePiece(1); }
   function rotate() { rotatePiece(); }
   function soft() { softDrop(); }
   function hard() { hardDrop(); }
 
-  // Rendered board includes current piece
   const renderBoard = getBoardWithPiece();
 
   return (
     <div>
       <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
-          {/* TouchArea wraps the canvas to capture gestures */}
           <TouchArea onLeft={moveLeft} onRight={moveRight} onRotate={rotate} onSoft={soft} onHard={hard}>
-            <BoardCanvas board={renderBoard} width={WIDTH} height={HEIGHT} />
+            <BoardCanvas board={renderBoard} width={WIDTH} height={HEIGHT} maxBlockSize={maxBlock} />
           </TouchArea>
 
           <div className="controls" style={{ marginTop: 8, justifyContent: 'center' }}>
@@ -360,7 +330,6 @@ export default function TetrisGame() {
             <button className="skill-btn" disabled={!canUse('swapNext')} onClick={useSkillSwapNext}>Swap Next</button>
           </div>
 
-          {/* Mobile virtual controls (always present but CSS can hide on desktop if needed) */}
           <div style={{ marginTop: 8 }}>
             <MobileControls onLeft={moveLeft} onRight={moveRight} onRotate={rotate} onSoft={soft} onHard={hard} />
           </div>
@@ -374,7 +343,7 @@ export default function TetrisGame() {
                 const b = Array.from({ length: 4 }, () => Array(4).fill(EMPTY));
                 nextPiece.matrix.forEach((r, ry) => r.forEach((c, rx) => { if (c) b[ry + 0][rx + 0] = COLORS[nextPiece.type]; }));
                 return b;
-              })()} width={4} height={4} blockSize={18} />
+              })()} width={4} height={4} blockSize={18} maxBlockSize={maxBlock} />
             </div>
           </div>
 
