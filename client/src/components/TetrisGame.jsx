@@ -6,7 +6,6 @@ import BoardCanvas from './BoardCanvas';
 import MobileControls from './MobileControls';
 import TouchArea from './TouchArea';
 import useWindowSize from '../hooks/useWindowSize';
-import './tetris-extra.css';
 import { io } from 'socket.io-client';
 
 const SERVER = (import.meta.env.VITE_SERVER_URL) || 'http://localhost:4000';
