@@ -153,7 +153,99 @@ canvas{
   border:1px solid rgba(255,255,255,0.02);
 }
 .leaderboard li strong{ color: #fff; }
+body {
+  background: radial-gradient(800px 400px at 10% 8%, rgba(12,34,56,0.35), transparent 10%),
+              linear-gradient(180deg,#071126 0%, #081335 100%);
+  color: #EAF6FF;
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
 
+/* container */
+.container {
+  max-width: 1280px;
+  margin: 28px auto;
+  padding: 18px;
+}
+
+/* card */
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 12px 30px rgba(2,6,23,0.6);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* focus style for game wrapper so users know it has keyboard focus */
+div[tabindex="0"]:focus {
+  box-shadow: 0 0 0 4px rgba(96,165,250,0.08), 0 8px 30px rgba(2,6,23,0.6);
+  outline: none;
+  border-radius: 12px;
+}
+
+/* control buttons */
+.skill-btn {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--muted, rgba(226,232,240,0.85));
+  font-weight: 600;
+  transition: transform .08s ease, box-shadow .12s ease, background .12s;
+}
+.skill-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(2,6,23,0.5); }
+.skill-btn:active { transform: translateY(0); }
+
+/* mobile controls adjust */
+.mobile-controls {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+.mc-btn {
+  min-width: 52px;
+  min-height: 52px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.05);
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(2,6,23,0.6);
+}
+
+/* canvas card center + subtle border */
+.board-canvas-wrap {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding: 10px;
+}
+canvas {
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.04));
+  box-shadow: inset 0 -6px 18px rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* header style small polish */
+.site-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding: 12px 18px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
 
 
 /* responsive */
@@ -260,100 +352,8 @@ canvas {
 }
 /* ---------- UI polish for desktop & mobile ---------- */
 
-/* nicer page background */
-body {
-  background: radial-gradient(800px 400px at 10% 8%, rgba(12,34,56,0.35), transparent 10%),
-              linear-gradient(180deg,#071126 0%, #081335 100%);
-  color: #EAF6FF;
-  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
 
-/* container */
-.container {
-  max-width: 1280px;
-  margin: 28px auto;
-  padding: 18px;
-}
 
-/* card */
-.card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 12px 30px rgba(2,6,23,0.6);
-  border: 1px solid rgba(255,255,255,0.04);
-}
-
-/* focus style for game wrapper so users know it has keyboard focus */
-div[tabindex="0"]:focus {
-  box-shadow: 0 0 0 4px rgba(96,165,250,0.08), 0 8px 30px rgba(2,6,23,0.6);
-  outline: none;
-  border-radius: 12px;
-}
-
-/* control buttons */
-.skill-btn {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.04);
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--muted, rgba(226,232,240,0.85));
-  font-weight: 600;
-  transition: transform .08s ease, box-shadow .12s ease, background .12s;
-}
-.skill-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(2,6,23,0.5); }
-.skill-btn:active { transform: translateY(0); }
-
-/* mobile controls adjust */
-.mobile-controls {
-  position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-.mc-btn {
-  min-width: 52px;
-  min-height: 52px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.05);
-  font-size: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 20px rgba(2,6,23,0.6);
-}
-
-/* canvas card center + subtle border */
-.board-canvas-wrap {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding: 10px;
-}
-canvas {
-  border-radius: 8px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.04));
-  box-shadow: inset 0 -6px 18px rgba(0,0,0,0.35);
-  border: 1px solid rgba(255,255,255,0.03);
-}
-
-/* header style small polish */
-.site-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding: 12px 18px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
 
 /* small responsive tweaks */
 @media (max-width: 900px){
