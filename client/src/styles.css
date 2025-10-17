@@ -217,4 +217,58 @@ canvas {
   bottom: calc(12px + env(safe-area-inset-bottom));
   z-index: 9999;
 }
+/* ---------- desktop-friendly layout ---------- */
+
+/* 主容器最大寬度提高（桌機使用） */
+.container {
+  max-width: 1400px;   /* 改成 1200~1600 視你喜好 */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 默認 layout：左側遊戲佔大部分，右側 sidebar 固定寬 */
+.layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* 左側 (遊戲) 區塊 */
+.left {
+  flex: 1 1 auto;
+  min-width: 480px; /* 保證桌機不會太小 */
+}
+
+/* 右側固定 sidebar */
+.right {
+  width: 340px; /* leaderboard 等 */
+}
+
+/* Desktop: 讓畫布 wrapper 有更多空間並居中 */
+.board-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* Canvas 在桌機可以放大（實際像素由 BoardCanvas 決定） */
+canvas {
+  /* CSS 寬度受 wrapper 控制；不要設固定小值 */
+  max-width: 100%;
+  height: auto;
+}
+
+/* 若你希望桌機時顯得更大，可以放寬右側 */
+@media (min-width: 1200px) {
+  .right { width: 380px; }
+  .container { padding-left: 28px; padding-right: 28px; }
+}
+
+/* 手機維持先前的保護 */
+@media (max-width: 900px) {
+  .layout { flex-direction: column-reverse; }
+  .right { width: 100%; max-height: 340px; }
+  .container { padding-bottom: calc(160px + env(safe-area-inset-bottom)); }
+}
 

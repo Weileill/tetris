@@ -4,9 +4,22 @@ import BoardCanvas from './BoardCanvas';
 import MobileControls from './MobileControls';
 import TouchArea from './TouchArea';
 import { io } from 'socket.io-client';
+import useWindowSize from '../hooks/useWindowSize'; // （下面我會給你小 hook）
 
-const SERVER = (import.meta.env.VITE_SERVER_URL) || 'http://localhost:4000';
-const socket = io(SERVER, { autoConnect: true });
+const SERVER = import.meta.env.VITE_SERVER_URL || window.location.origin;
+export const socket = io(SERVER, {
+  transports: ['websocket', 'polling'],
+  reconnection: true,
+  reconnectionAttempts: 10,
+  reconnectionDelay: 1000,
+  autoConnect: true,
+});
+
+socket.on('connect', () => console.log('socket connected to', SERVER, socket.id));
+socket.on('connect_error', (err) => console.warn('socket connect_error', err));
+socket.on('disconnect', (r) => console.log('socket disconnected', r));
+
+// ...
 
 const WIDTH = 10;
 const HEIGHT = 20;
@@ -21,6 +34,13 @@ const COLORS = {
   T: '#b13cff',
   Z: '#ff3b3b'
 };
+const { width: winW } = useWindowSize();
+const desktopMax = 48; // 桌機最大格子（可再調整）
+const mobileMax = 28;  // 手機最大格子
+const maxBlock = (winW && winW >= 1200) ? desktopMax : mobileMax;
+
+// 傳給 BoardCanvas
+<BoardCanvas board={renderBoard} width={WIDTH} height={HEIGHT} maxBlockSize={maxBlock} />
 
 const TETROMINOS = {
   I: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
