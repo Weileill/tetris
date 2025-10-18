@@ -141,3 +141,35 @@ canvas{ display:block; margin:0 auto; border-radius:10px; background: linear-gra
 /* small animation */
 @keyframes floaty { 0%{ transform:translateY(0); } 50%{ transform:translateY(-4px);} 100%{ transform:translateY(0);} }
 .brand-title{ animation: floaty 6s ease-in-out infinite; }
+/* Stabilize mobile controls: no animation, fixed bottom, safe-area aware */
+.mobile-controls {
+  transition: none !important;
+  transform: none !important;
+  will-change: auto !important;
+  position: fixed !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+  display: flex !important;
+}
+
+/* prevent children from having animations that move the wrapper */
+.mobile-controls * {
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+/* ensure it doesn't get clipped or reflowed by ancestor layout */
+.game-container, .container, .left, .card-body {
+  /* ensure there's room reserved for mobile-controls */
+  padding-bottom: calc(160px + env(safe-area-inset-bottom)) !important;
+}
+
+/* hide mobile controls visually when input is focused (JS will toggle display as well) */
+.mobile-controls.hidden-by-keyboard {
+  display: none !important;
+  pointer-events: none !important;
+}
