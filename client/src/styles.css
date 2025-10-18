@@ -367,3 +367,64 @@ canvas{
 
 /* Safety: lower common site-wide fixed footers if present */
 .fixed-bottom, .site-footer, .instagram-like-bottom { z-index: 2 !important; pointer-events: none !important; }
+/* ===== fixes for mobile-controls / desktop controls & safe area ===== */
+
+/* 1) On desktop: hide mobile controls entirely (avoid any overlap) */
+@media (min-width: 901px) {
+  .mobile-controls {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* make sure desktop controls are on top */
+  .controls, .skill-btn, .desktop-controls {
+    z-index: 99999 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* 2) On mobile: show mobile controls and reserve bottom space */
+@media (max-width: 900px) {
+  /* reserve space so game area not hidden by mobile controls */
+  .container, .app-root, .game-container, .left, .card, .card-body {
+    padding-bottom: calc(140px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .mobile-controls {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+    display: flex !important;
+  }
+
+  /* if you keep desktop controls in the same place, hide them on mobile so they don't conflict visually */
+  .desktop-controls {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  /* ensure the bottom-buttons area (if still present) sits above overlays */
+  .controls-bottom {
+    z-index: 99998 !important;
+    position: relative !important;
+  }
+
+  /* ensure canvas wrapper not collapsed */
+  .board-canvas-wrap { min-height: 320px !important; overflow: visible !important; }
+  canvas { max-width: 100% !important; height: auto !important; display:block !important; }
+}
+
+/* 3) General: protect mobile-controls from being overlapped by other fixed footers */
+.footer-note, .some-fixed-footer, .bottom-fixed-bar {
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+/* 4) Optional: if your desktop controls are at bottom and you prefer them above everything:
+   add a class to the container of those buttons: className="controls desktop-controls controls-bottom"
+   and they'll be clickable on desktop due to high z-index. */
