@@ -1,14 +1,11 @@
-/* 基本字體建議（可在 index.html 加 Google Font） */
 /* =========================
-   styles.css — polished UI
+   styles.css — polished UI + mobile fixes
    Replace your current styles.css with this file
    ========================= */
 
-/* Import Inter (if blocked/slow you can add <link> in index.html instead) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
 :root{
-  /* color palette */
   --bg-1: #071126;
   --bg-2: #071a2b;
   --accent: #7dd3fc;
@@ -17,239 +14,85 @@
   --glass-2: rgba(255,255,255,0.035);
   --muted: rgba(226,232,240,0.75);
   --card-radius: 14px;
-
-  /* spacing / sizing */
   --page-pad: 20px;
   --container-w: 1400px;
   --shadow-1: 0 12px 30px rgba(2,6,23,0.6);
   --glass-border: 1px solid rgba(255,255,255,0.04);
 }
 
-/* -------------------------
-   Base / Layout
-   ------------------------- */
+/* Base */
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; }
 body {
   font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   color: #eaf6ff;
   -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
   background:
     radial-gradient(800px 400px at 8% 6%, rgba(13,41,75,0.55), transparent 10%),
     linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
   min-height: 100vh;
-  overflow-y: auto;
   padding: 28px 0;
 }
 
-/* main container centered */
-.container{
-  width: 100%;
-  max-width: var(--container-w);
-  margin: 0 auto;
-  padding: var(--page-pad);
-}
+/* container & header */
+.container{ width:100%; max-width:var(--container-w); margin:0 auto; padding:var(--page-pad); }
+.site-header{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 16px; margin-bottom:18px; border-radius:12px; background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); backdrop-filter: blur(6px) saturate(120%); border: var(--glass-border); box-shadow: var(--shadow-1); }
+.brand-title{ font-weight:800; letter-spacing:4px; font-size:20px; color: var(--accent); }
+.brand-sub{ font-size:12px; color:var(--muted); margin-top:2px; font-weight:500; }
+.made-by{ font-size:12px; color: rgba(255,255,255,0.85); padding:6px 12px; border-radius:999px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); box-shadow: 0 6px 18px rgba(2,6,23,0.45); border: var(--glass-border); }
 
-/* header */
-.site-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 16px;
-  padding: 12px 16px;
-  margin-bottom: 18px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  backdrop-filter: blur(6px) saturate(120%);
-  border: var(--glass-border);
-  box-shadow: var(--shadow-1);
-}
-
-/* brand */
-.brand-title{
-  font-weight:800;
-  letter-spacing:4px;
-  font-size:20px;
-  color: var(--accent);
-}
-.brand-sub{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:2px;
-  font-weight:500;
-}
-
-/* made-by pill top-right */
-.made-by{
-  font-size:12px;
-  color: rgba(255,255,255,0.85);
-  padding:6px 12px;
-  border-radius:999px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  box-shadow: 0 6px 18px rgba(2,6,23,0.45);
-  border: var(--glass-border);
-  display:inline-flex;
-  align-items:center;
-}
-
-/* layout columns */
-.layout{
-  display:flex;
-  gap:22px;
-  align-items:flex-start;
-}
-.left{ flex: 1 1 0; min-width: 360px; }
-.right{ width: 340px; }
+/* layout */
+.layout{ display:flex; gap:22px; align-items:flex-start; }
+.left{ flex:1 1 0; min-width:360px; }
+.right{ width:340px; }
 
 /* card / glass */
-.card{
-  background: linear-gradient(180deg, var(--glass-1), var(--glass-2));
-  border-radius: var(--card-radius);
-  padding:14px;
-  box-shadow: var(--shadow-1);
-  border: var(--glass-border);
-  overflow: hidden;
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(2,6,23,0.65); }
+.card{ background: linear-gradient(180deg, var(--glass-1), var(--glass-2)); border-radius: var(--card-radius); padding:14px; box-shadow: var(--shadow-1); border: var(--glass-border); overflow: hidden; transition: transform .18s ease, box-shadow .18s ease; }
+.card:hover{ transform: translateY(-6px); box-shadow: 0 20px 50px rgba(2,6,23,0.65); }
+.card-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.card-header h2{ margin:0; font-size:15px; color:#fff; font-weight:700; }
+.card-body{ padding:8px 0; }
 
-/* card header */
-.card-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:10px;
-}
-.card-header h2{
-  margin:0;
-  font-size:15px;
-  color:#fff;
-  font-weight:700;
-}
+/* board canvas wrapper */
+.board-canvas-wrap { display:flex; justify-content:center; align-items:center; padding:10px; background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(255,255,255,0.01)); border-radius:10px; border:1px solid rgba(255,255,255,0.02); min-height: var(--available-game-height, 360px); overflow: visible; }
 
-/* card body */
-.card-body{
-  padding: 8px 0;
-}
+/* canvas */
+canvas{ display:block; margin:0 auto; border-radius:10px; background: linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.03)); box-shadow: inset 0 -8px 20px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.03); max-width:100%; height:auto; }
 
-/* Canvas wrapper center */
-.board-canvas-wrap {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding: 10px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(255,255,255,0.01));
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.02);
-}
-
-/* canvas styling */
-canvas{
-  display:block;
-  margin:0 auto;
-  border-radius:10px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.14), rgba(0,0,0,0.03));
-  box-shadow: inset 0 -8px 20px rgba(0,0,0,0.2);
-  border: 1px solid rgba(255,255,255,0.03);
-}
-
-/* controls/buttons */
-.controls{
-  display:flex;
-  gap:10px;
-  margin-top:12px;
-  justify-content:center;
-  flex-wrap:wrap;
-}
-.skill-btn{
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.04);
-  padding:10px 14px;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:700;
-  color: #eaf6ff;
-  transition: transform .08s ease, box-shadow .12s ease, background .12s;
-  box-shadow: 0 8px 20px rgba(2,6,23,0.45);
-}
+/* controls and buttons */
+.controls{ display:flex; gap:10px; margin-top:12px; justify-content:center; flex-wrap:wrap; }
+.skill-btn{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.04); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700; color:#eaf6ff; transition: transform .08s ease, box-shadow .12s ease; box-shadow: 0 8px 20px rgba(2,6,23,0.45); }
 .skill-btn:hover{ transform: translateY(-3px); box-shadow: 0 18px 40px rgba(2,6,23,0.5); }
 .skill-btn:active{ transform: translateY(0); }
 .skill-btn[disabled]{ opacity:0.45; cursor:not-allowed; transform:none; }
+.skill-btn.primary{ background: linear-gradient(180deg, var(--accent), var(--accent-2)); color:#04212b; border:none; box-shadow: 0 10px 30px rgba(96,165,250,0.12); }
 
-/* highlight accent for primary action */
-.skill-btn.primary {
-  background: linear-gradient(180deg, var(--accent), var(--accent-2));
-  color: #04212b;
-  border: none;
-  box-shadow: 0 10px 30px rgba(96,165,250,0.12);
-}
+/* HUD / stats */
+.hud{ display:flex; gap:12px; align-items:center; }
+.hud .stat{ background: rgba(255,255,255,0.02); padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.03); min-width:84px; text-align:center; }
+.hud .value{ font-weight:800; font-size:18px; color:#fff; }
+.hud .label{ font-size:12px; color:var(--muted); }
 
-/* small HUD / stats */
-.hud {
-  display:flex;
-  gap:12px;
-  align-items:center;
-  justify-content:flex-start;
-}
-.hud .stat {
-  background: rgba(255,255,255,0.02);
-  padding:8px 10px;
-  border-radius:10px;
-  border: 1px solid rgba(255,255,255,0.03);
-  min-width:84px;
-  text-align:center;
-}
-.hud .stat .value { font-weight:800; font-size:18px; color:#fff; }
-.hud .stat .label { font-size:12px; color:var(--muted); }
-
-/* leaderboard refined */
-.leaderboard{
-  font-size:14px;
-}
+/* leaderboard */
+.leaderboard{ font-size:14px; }
 .leaderboard ul{ list-style:none; padding:0; margin:0; max-height:460px; overflow:auto; }
-.leaderboard li{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  padding:12px 10px;
-  align-items:center;
-  border-radius:10px;
-  margin-bottom:8px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.012), rgba(255,255,255,0.002));
-  border:1px solid rgba(255,255,255,0.02);
-}
-.leaderboard li strong{ color: #fff; font-weight:700; }
-.leaderboard .pos { font-weight:800; color: var(--accent); margin-right:8px; }
+.leaderboard li{ display:flex; justify-content:space-between; gap:10px; padding:12px 10px; align-items:center; border-radius:10px; margin-bottom:8px; background: linear-gradient(90deg, rgba(255,255,255,0.012), rgba(255,255,255,0.002)); border:1px solid rgba(255,255,255,0.02); }
+.leaderboard li strong{ color:#fff; font-weight:700; }
+.leaderboard .pos{ font-weight:800; color:var(--accent); margin-right:8px; }
 
-/* next piece block */
-.next-box {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background: rgba(255,255,255,0.02);
-  border-radius:8px;
-  padding:8px;
-  border: 1px solid rgba(255,255,255,0.03);
-}
+/* next piece */
+.next-box{ display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.02); border-radius:8px; padding:8px; border:1px solid rgba(255,255,255,0.03); }
 
 /* footer / tip */
-.footer-note {
-  margin-top:18px;
-  color: var(--muted);
-  font-size:13px;
-  text-align:center;
-  position: relative;
-  z-index: 2;
-}
+.footer-note{ margin-top:18px; color:var(--muted); font-size:13px; text-align:center; position:relative; z-index:2; pointer-events:none; }
 
-/* mobile controls (sticky bottom) */
-.mobile-controls {
+/* mobile controls (visible only on mobile, hidden on desktop) */
+.mobile-controls{
   position: fixed;
   left: 12px;
   right: 12px;
   bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 9999;
+  z-index: 99999;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -260,171 +103,41 @@ canvas{
   border: 1px solid rgba(255,255,255,0.03);
   box-shadow: 0 12px 30px rgba(2,6,23,0.6);
 }
-.mc-btn {
-  min-width: 48px;
-  min-height: 48px;
-  border-radius: 10px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:700;
-  font-size:18px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.04);
-  color:#eaf6ff;
-  box-shadow: 0 8px 20px rgba(2,6,23,0.45);
-}
+.mc-btn{ min-width:48px; min-height:48px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); color:#eaf6ff; box-shadow: 0 8px 20px rgba(2,6,23,0.45); }
 
-/* focus style for keyboard accessibility */
-.game-container[tabindex="0"]:focus {
-  outline: none;
-  box-shadow: 0 0 0 6px rgba(96,165,250,0.06), 0 20px 60px rgba(2,6,23,0.6);
-  border-radius: 12px;
-}
+/* keyboard focus */
+.game-container[tabindex="0"]:focus{ outline:none; box-shadow: 0 0 0 6px rgba(96,165,250,0.06), 0 20px 60px rgba(2,6,23,0.6); border-radius:12px; }
 
-/* responsive behaviors */
-@media (max-width: 900px){
-  .layout{ flex-direction: column-reverse; gap: 12px; }
-  .right{ width:100%; }
+/* Responsive: desktop / mobile behavior */
+@media (min-width:1200px){ .container{ padding-left:28px; padding-right:28px; } .right{ width:380px; } .left{ min-width:560px; } .card{ padding:16px; } }
+@media (max-width:900px){
+  .layout{ flex-direction: column-reverse; gap:12px; }
+  .right{ width:100%; display:block; }
   .container{ padding:12px; }
-  .site-header{ padding:10px; border-radius:10px; }
-  .card { padding:12px; }
-  .board-canvas-wrap { padding:6px; }
-  .hud { gap:8px; flex-wrap:wrap; }
-  .mc-btn { min-width:46px; min-height:46px; font-size:16px; }
-}
-
-/* desktop uplift */
-@media (min-width: 1200px) {
-  .container { padding-left: 28px; padding-right: 28px; }
-  .right { width:380px; }
-  .left { min-width: 560px; }
-  .card { padding:16px; }
-}
-
-/* small polished animations for subtle life */
-@keyframes floaty {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-4px); }
-  100% { transform: translateY(0px); }
-}
-.brand-title { animation: floaty 6s ease-in-out infinite; }
-
-/* utility helpers you might reuse */
-.text-muted { color: var(--muted); }
-.center { display:flex; align-items:center; justify-content:center; }
-.p-8 { padding:8px; }
-/* ---------- Mobile overlay & visibility fixes (add to styles.css) ---------- */
-
-/* Ensure game area and controls have precedence on mobile */
-@media (max-width: 900px) {
-  /* reserve bottom space for mobile controls so canvas/board won't be hidden */
-  .container, .app-root, .game-container, .left, .card, .card-body {
-    padding-bottom: calc(160px + env(safe-area-inset-bottom)) !important;
-    position: relative !important;
-    z-index: 10 !important;
-  }
-
-  /* ensure mobile-controls are fixed above everything else */
-  .mobile-controls {
-    position: fixed !important;
-    left: 12px !important;
-    right: 12px !important;
-    bottom: calc(12px + env(safe-area-inset-bottom)) !important;
-    z-index: 99999 !important;
-    pointer-events: auto !important;
-  }
-
-  /* prevent tip/footer from intercepting touches */
-  .footer-note, .tip, .tips, .bottom-fixed-bar, .some-fixed-footer {
-    pointer-events: none !important;
-    z-index: 1 !important;
-  }
-
-  /* make touch-area accept touches but not be under overlays */
-  .touch-area {
-    position: relative !important;
-    z-index: 50 !important;
-    touch-action: none !important;
-  }
-
-  /* ensure canvas wrapper not collapsed */
-  .board-canvas-wrap {
-    min-height: 340px !important;
-    overflow: visible !important;
-  }
-
-  canvas {
-    max-width: 100% !important;
-    height: auto !important;
-    display:block !important;
+  .board-canvas-wrap{ padding:6px; }
+  .mc-btn{ min-width:46px; min-height:46px; font-size:16px; }
+  /* portrait-specific refinement */
+  @media (orientation: portrait) {
+    .right { display:none !important; }
+    .left { width:100% !important; flex:1 1 auto !important; min-width:100% !important; }
+    .site-header { padding: 8px 10px !important; max-height:86px; overflow:hidden; }
+    .container, .game-container, .app-root, .card-body { padding-bottom: calc(160px + env(safe-area-inset-bottom)) !important; }
+    .board-canvas-wrap { min-height: calc(100vh - 160px) !important; display:flex !important; justify-content:center !important; align-items:center !important; overflow: visible !important; }
+    canvas { width:100% !important; height:auto !important; }
+    .mobile-controls { z-index:99999 !important; pointer-events:auto !important; }
+    .footer-note, .tip, .tips { pointer-events:none !important; z-index:1 !important; }
   }
 }
 
-/* Global fallback if some element still hides controls */
-.mobile-controls { z-index: 99999 !important; pointer-events: auto !important; }
-.footer-note { pointer-events: none !important; z-index: 1 !important; }
-
-/* Safety: lower common site-wide fixed footers if present */
-.fixed-bottom, .site-footer, .instagram-like-bottom { z-index: 2 !important; pointer-events: none !important; }
-/* ===== fixes for mobile-controls / desktop controls & safe area ===== */
-
-/* 1) On desktop: hide mobile controls entirely (avoid any overlap) */
-@media (min-width: 901px) {
-  .mobile-controls {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-
-  /* make sure desktop controls are on top */
-  .controls, .skill-btn, .desktop-controls {
-    z-index: 99999 !important;
-    position: relative !important;
-    pointer-events: auto !important;
-  }
+/* ensure mobile-controls hidden on desktop to avoid interference */
+@media (min-width:901px){
+  .mobile-controls{ display:none !important; pointer-events:none !important; visibility:hidden !important; }
+  .controls, .skill-btn, .desktop-controls { z-index:99999 !important; position:relative !important; pointer-events:auto !important; }
 }
 
-/* 2) On mobile: show mobile controls and reserve bottom space */
-@media (max-width: 900px) {
-  /* reserve space so game area not hidden by mobile controls */
-  .container, .app-root, .game-container, .left, .card, .card-body {
-    padding-bottom: calc(140px + env(safe-area-inset-bottom)) !important;
-  }
+/* dynamic available height variable fallback usage */
+.board-canvas-wrap { min-height: var(--available-game-height, 360px); }
 
-  .mobile-controls {
-    position: fixed !important;
-    left: 12px !important;
-    right: 12px !important;
-    bottom: calc(12px + env(safe-area-inset-bottom)) !important;
-    z-index: 99999 !important;
-    pointer-events: auto !important;
-    display: flex !important;
-  }
-
-  /* if you keep desktop controls in the same place, hide them on mobile so they don't conflict visually */
-  .desktop-controls {
-    display: none !important;
-    pointer-events: none !important;
-  }
-
-  /* ensure the bottom-buttons area (if still present) sits above overlays */
-  .controls-bottom {
-    z-index: 99998 !important;
-    position: relative !important;
-  }
-
-  /* ensure canvas wrapper not collapsed */
-  .board-canvas-wrap { min-height: 320px !important; overflow: visible !important; }
-  canvas { max-width: 100% !important; height: auto !important; display:block !important; }
-}
-
-/* 3) General: protect mobile-controls from being overlapped by other fixed footers */
-.footer-note, .some-fixed-footer, .bottom-fixed-bar {
-  pointer-events: none !important;
-  z-index: 1 !important;
-}
-
-/* 4) Optional: if your desktop controls are at bottom and you prefer them above everything:
-   add a class to the container of those buttons: className="controls desktop-controls controls-bottom"
-   and they'll be clickable on desktop due to high z-index. */
+/* small animation */
+@keyframes floaty { 0%{ transform:translateY(0); } 50%{ transform:translateY(-4px);} 100%{ transform:translateY(0);} }
+.brand-title{ animation: floaty 6s ease-in-out infinite; }
