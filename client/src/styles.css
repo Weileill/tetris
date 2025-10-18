@@ -314,3 +314,56 @@ canvas{
 .text-muted { color: var(--muted); }
 .center { display:flex; align-items:center; justify-content:center; }
 .p-8 { padding:8px; }
+/* ---------- Mobile overlay & visibility fixes (add to styles.css) ---------- */
+
+/* Ensure game area and controls have precedence on mobile */
+@media (max-width: 900px) {
+  /* reserve bottom space for mobile controls so canvas/board won't be hidden */
+  .container, .app-root, .game-container, .left, .card, .card-body {
+    padding-bottom: calc(160px + env(safe-area-inset-bottom)) !important;
+    position: relative !important;
+    z-index: 10 !important;
+  }
+
+  /* ensure mobile-controls are fixed above everything else */
+  .mobile-controls {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+  }
+
+  /* prevent tip/footer from intercepting touches */
+  .footer-note, .tip, .tips, .bottom-fixed-bar, .some-fixed-footer {
+    pointer-events: none !important;
+    z-index: 1 !important;
+  }
+
+  /* make touch-area accept touches but not be under overlays */
+  .touch-area {
+    position: relative !important;
+    z-index: 50 !important;
+    touch-action: none !important;
+  }
+
+  /* ensure canvas wrapper not collapsed */
+  .board-canvas-wrap {
+    min-height: 340px !important;
+    overflow: visible !important;
+  }
+
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    display:block !important;
+  }
+}
+
+/* Global fallback if some element still hides controls */
+.mobile-controls { z-index: 99999 !important; pointer-events: auto !important; }
+.footer-note { pointer-events: none !important; z-index: 1 !important; }
+
+/* Safety: lower common site-wide fixed footers if present */
+.fixed-bottom, .site-footer, .instagram-like-bottom { z-index: 2 !important; pointer-events: none !important; }
