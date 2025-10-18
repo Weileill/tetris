@@ -173,3 +173,50 @@ canvas{ display:block; margin:0 auto; border-radius:10px; background: linear-gra
   display: none !important;
   pointer-events: none !important;
 }
+/* ---------- fixed mobile controls + safe spacing ---------- */
+
+/* base: mobile controls overlay */
+.mobile-controls {
+  position: fixed !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: auto !important;
+  transition: none !important; /* prevent animation/jitter */
+  transform: none !important;
+}
+
+/* ensure children don't introduce movement */
+.mobile-controls * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* CSS variables controlled by JS:
+   --controls-height : the real px height of .mobile-controls (including safe-area)
+   --available-game-height : available height for .board-canvas-wrap
+*/
+:root {
+  --controls-height: 160px;
+  --available-game-height: calc(100vh - var(--controls-height) - 88px); /* default fallback */
+}
+
+/* ensure container reserves bottom space so content doesn't go under overlay */
+.container, .app-root, .game-container, .left, .card-body {
+  padding-bottom: calc(var(--controls-height) + 24px) !important;
+}
+
+/* board wrapper uses available height to avoid being pushed down */
+.board-canvas-wrap {
+  min-height: var(--available-game-height) !important;
+  overflow: visible !important;
+}
+
+/* on desktop hide mobile-controls to avoid interference */
+@media (min-width: 901px) {
+  .mobile-controls { display: none !important; pointer-events: none !important; }
+}

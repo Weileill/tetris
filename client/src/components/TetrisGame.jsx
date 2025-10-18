@@ -128,6 +128,72 @@ export default function TetrisGame(){
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isRunning, board, piece]);
     
+   useEffect(() => {
+  function updateLayoutVars() {
+    try {
+      const doc = document.documentElement;
+      const mc = document.querySelector('.mobile-controls');
+      const header = document.querySelector('.site-header');
+      // measured heights
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const headerH = header ? header.getBoundingClientRect().height : 80;
+      let controlsH = 0;
+      if (mc) {
+        const r = mc.getBoundingClientRect();
+        controlsH = Math.max(56, Math.round(r.height)); // at least one row height
+      } else {
+        controlsH = 140; // fallback
+      }
+      // safe-area inset bottom (browser supports env)
+      // compute reserved total: header + controls + buffer
+      const buffer = 24; // extra spacing to avoid touching edges
+      const reserved = headerH + controlsH + buffer;
+      const avail = Math.max(200, Math.round(vh - reserved));
+
+      // set css vars (controls height includes safe-area in CSS bottom calc)
+      doc.style.setProperty('--controls-height', `${controlsH}px`);
+      doc.style.setProperty('--available-game-height', `${avail}px`);
+
+      // also ensure container padding-bottom equals controls + small buffer (for non-js fallback)
+      const containers = document.querySelectorAll('.container, .app-root, .game-container, .left, .card-body');
+      containers.forEach(c => {
+        c.style.paddingBottom = `${controlsH + 24}px`;
+      });
+
+      // ensure mobile-controls anchored a bit above keyboard when keyboard present
+      if (window.visualViewport) {
+        const extra = Math.max(0, window.innerHeight - window.visualViewport.height);
+        if (mc) {
+          // set bottom to base + extra via style (keeps it visible above keyboard)
+          const base = 12; // px
+          mc.style.bottom = `calc(${base + extra}px + env(safe-area-inset-bottom))`;
+        }
+      }
+    } catch (e) {
+      console.warn('updateLayoutVars error', e);
+    }
+  }
+
+  updateLayoutVars();
+  window.addEventListener('resize', updateLayoutVars);
+  window.addEventListener('orientationchange', updateLayoutVars);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateLayoutVars);
+    window.visualViewport.addEventListener('scroll', updateLayoutVars);
+  }
+
+  // small delayed call to handle URL bar collapse / browser adjustments
+  const t = setTimeout(updateLayoutVars, 600);
+  return () => {
+    window.removeEventListener('resize', updateLayoutVars);
+    window.removeEventListener('orientationchange', updateLayoutVars);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', updateLayoutVars);
+      window.visualViewport.removeEventListener('scroll', updateLayoutVars);
+    }
+    clearTimeout(t);
+  };
+   }, []);
 
   useEffect(()=>{
     if(!isRunning) return;
