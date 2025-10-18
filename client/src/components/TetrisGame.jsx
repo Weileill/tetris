@@ -127,73 +127,7 @@ export default function TetrisGame(){
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isRunning, board, piece]);
-    useEffect(() => {
-  const mc = document.querySelector('.mobile-controls');
-  if (!mc) return;
-
-  // apply stable base styles (defensive)
-  mc.style.transition = 'none';
-  mc.style.transform = 'none';
-  mc.style.position = 'fixed';
-
-  function updateControlsPosition() {
-    try {
-      // If visualViewport available, use it to detect keyboard causing viewport shrink
-      let extra = 0;
-      if (window.visualViewport) {
-        // difference between layout viewport height and visual viewport height is keyboard height
-        extra = Math.max(0, window.innerHeight - window.visualViewport.height);
-      }
-      // base bottom offset in px
-      const base = 12;
-      // final bottom = base + keyboardHeight + safe-area (we keep env(safe-area-inset-bottom) in CSS)
-      mc.style.bottom = `calc(${base + extra}px + env(safe-area-inset-bottom))`;
-      mc.classList.remove('hidden-by-keyboard'); // ensure visible by default
-      // disable transitions so it doesn't animate when value changes
-      mc.style.transition = 'none';
-    } catch (e) {
-      // fail silently
-      console.warn('updateControlsPosition error', e);
-    }
-  }
-
-  // hide controls while an input is focused (so keyboard doesn't cover them)
-  function onFocusIn(e) {
-    const t = e.target;
-    if (!t) return;
-    const tag = t.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || t.isContentEditable) {
-      mc.classList.add('hidden-by-keyboard');
-    }
-  }
-  function onFocusOut() {
-    mc.classList.remove('hidden-by-keyboard');
-    // recalc position after keyboard gone
-    setTimeout(updateControlsPosition, 120);
-  }
-
-  // listeners
-  updateControlsPosition();
-  window.addEventListener('resize', updateControlsPosition);
-  window.addEventListener('orientationchange', updateControlsPosition);
-  window.addEventListener('focusin', onFocusIn);
-  window.addEventListener('focusout', onFocusOut);
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', updateControlsPosition);
-    window.visualViewport.addEventListener('scroll', updateControlsPosition);
-  }
-
-  return () => {
-    window.removeEventListener('resize', updateControlsPosition);
-    window.removeEventListener('orientationchange', updateControlsPosition);
-    window.removeEventListener('focusin', onFocusIn);
-    window.removeEventListener('focusout', onFocusOut);
-    if (window.visualViewport) {
-      window.visualViewport.removeEventListener('resize', updateControlsPosition);
-      window.visualViewport.removeEventListener('scroll', updateControlsPosition);
-    }
-  };
-}, []);
+    
 
   useEffect(()=>{
     if(!isRunning) return;
